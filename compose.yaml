@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+    database:
+        image: postgres:14
+        container_name: projects-db
+        volumes:
+            - projects-data:/var/lib/postgresql/data/
+        environment:
+            - POSTGRES_DB=dbo
+            - POSTGRES_USER=myuser
+            - POSTGRES_PASSWORD=password
+            - PGDATA=/var/lib/postgresql/data/pgdata
+        shm_size: 256MB
+        ports: 
+            - "5432:5432"
+    
+    frontend:
+        container_name: projects-web
+        build: 
+            dockerfile: ./Dockerfile
+            context: ./frontend
+        ports:
+            - "5173:5173"    
+    
+    backend:
+        container_name: projects-server
+        build:
+            dockerfile: ./backend/Dockerfile
+            context: ./backend
+
+        ports:
+            - "5195:80"
+        depends_on:
+            - database
+          
+volumes:
+    projects-data:
